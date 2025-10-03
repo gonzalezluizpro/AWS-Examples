@@ -25,15 +25,10 @@ jobs:
       - name: Check Terraform formatting
         run: terraform fmt -check -recursive
 
-      - name: Find all day* Terraform folders
-        id: folders
+      - name: Validate each Terraform project in folders starting with "day"
         run: |
-          echo "dirs=$(find . -type f -name 'main.tf' -path './day*/main.tf' -exec dirname {} \; | sort | uniq | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-
-      - name: Terraform Init & Validate in each folder
-        run: |
-          for dir in $(echo ${{ fromJSON(steps.folders.outputs.dirs) }} | jq -r '.[]'); do
-            echo "🔍 Running Terraform in $dir"
+          for dir in $(find . -type f -name 'main.tf' -path './day*/*' -exec dirname {} \; | sort -u); do
+            echo "🔍 Validating Terraform in $dir"
             terraform -chdir="$dir" init -backend=false
             terraform -chdir="$dir" validate
           done
