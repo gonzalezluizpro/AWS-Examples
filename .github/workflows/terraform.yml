@@ -1,0 +1,39 @@
+name: Terraform Validate & Format
+
+on:
+  push:
+    paths:
+      - '**.tf'
+  pull_request:
+    paths:
+      - '**.tf'
+
+jobs:
+  terraform:
+    name: Validate Terraform in all "day*" folders
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive
+
+      - name: Find all day* Terraform folders
+        id: folders
+        run: |
+          echo "dirs=$(find . -type f -name 'main.tf' -path './day*/main.tf' -exec dirname {} \; | sort | uniq | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
+      - name: Terraform Init & Validate in each folder
+        run: |
+          for dir in $(echo ${{ fromJSON(steps.folders.outputs.dirs) }} | jq -r '.[]'); do
+            echo "🔍 Running Terraform in $dir"
+            terraform -chdir="$dir" init -backend=false
+            terraform -chdir="$dir" validate
+          done
