@@ -11,7 +11,6 @@ terraform {
 
 provider "aws" {
   region  = var.aws_region
-  profile = var.aws_profile
 }
 
 # Create IAM user
@@ -47,3 +46,4 @@ output "access_key_id" {
   description = "If created, the access key ID for the IAM user"
   sensitive   = true
 }
+
