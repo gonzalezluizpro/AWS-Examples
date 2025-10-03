@@ -20,7 +20,7 @@ variable "iam_user_name" {
 variable "attach_policy_arns" {
   description = "List of managed policy ARNs to attach to the IAM user"
   type        = list(string)
-  default     = [
+  default = [
     "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
   ]
 }

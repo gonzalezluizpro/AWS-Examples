@@ -22,8 +22,8 @@ resource "aws_iam_user" "this" {
 
 # Attach one or more managed policies (example: S3 ReadOnly)
 resource "aws_iam_user_policy_attachment" "managed" {
-  for_each  = toset(var.attach_policy_arns)
-  user      = aws_iam_user.this.name
+  for_each   = toset(var.attach_policy_arns)
+  user       = aws_iam_user.this.name
   policy_arn = each.value
 }
 
